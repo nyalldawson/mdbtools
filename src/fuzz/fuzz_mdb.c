@@ -7,10 +7,12 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         for (int j=0; j<mdb->num_catalog; j++) {
             MdbCatalogEntry *entry = g_ptr_array_index (mdb->catalog, j);
             MdbTableDef *table = mdb_read_table(entry);
-            mdb_read_columns(table);
-            mdb_rewind_table(table);
-            while (mdb_fetch_row(table));
-            mdb_free_tabledef(table);
+            if (table) {
+                mdb_read_columns(table);
+                mdb_rewind_table(table);
+                while (mdb_fetch_row(table));
+                mdb_free_tabledef(table);
+            }
         }
         mdb_close(mdb);
     }
