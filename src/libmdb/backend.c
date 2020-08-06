@@ -122,7 +122,7 @@ static MdbBackendType mdb_postgres_types[] = {
 		MdbBackendType_STRUCT_ELEMENT("Postgres_Unknown 0x0d",0,0,0),
 		MdbBackendType_STRUCT_ELEMENT("Postgres_Unknown 0x0e",0,0,0),
 		MdbBackendType_STRUCT_ELEMENT("UUID",0,0,0),
-		MdbBackendType_STRUCT_ELEMENT("Postgres_Unknown 0x10",0,0,0),
+		MdbBackendType_STRUCT_ELEMENT("NUMERIC",1,1,0),
 };
 static MdbBackendType mdb_postgres_shortdate_type =
 		MdbBackendType_STRUCT_ELEMENT("DATE",0,0,0);
@@ -131,7 +131,7 @@ static MdbBackendType mdb_postgres_serial_type =
 
 /*    MySQL data types */
 static MdbBackendType mdb_mysql_types[] = {
-		MdbBackendType_STRUCT_ELEMENT("Text",1,0,1),
+		MdbBackendType_STRUCT_ELEMENT("text",0,0,1),
 		MdbBackendType_STRUCT_ELEMENT("boolean", 0, 0, 0),
 		MdbBackendType_STRUCT_ELEMENT("tinyint", 0, 0, 0),
 		MdbBackendType_STRUCT_ELEMENT("smallint", 0, 0, 0),
@@ -143,9 +143,9 @@ static MdbBackendType mdb_mysql_types[] = {
 		MdbBackendType_STRUCT_ELEMENT("varchar",1,0,1),
 		MdbBackendType_STRUCT_ELEMENT("varchar",1,0,1),
 		MdbBackendType_STRUCT_ELEMENT("varchar",1,0,1),
-		MdbBackendType_STRUCT_ELEMENT("text",1,0,1),
+		MdbBackendType_STRUCT_ELEMENT("text",0,0,1),
 		MdbBackendType_STRUCT_ELEMENT("blob",0,0,0),
-		MdbBackendType_STRUCT_ELEMENT("text",1,0,1),
+		MdbBackendType_STRUCT_ELEMENT("text",0,0,1),
 		MdbBackendType_STRUCT_ELEMENT("char(38)",0,0,0),
 		MdbBackendType_STRUCT_ELEMENT("numeric",1,1,0),
 };
@@ -184,7 +184,7 @@ enum {
 	MDB_BACKEND_SQLITE,
 };
 
-static gboolean mdb_drop_backend(gpointer key, gpointer value, gpointer data);
+static void mdb_drop_backend(gpointer key, gpointer value, gpointer data);
 
 static gchar*
 quote_generic(const gchar *value, gchar quote_char, gchar escape_char) {
@@ -451,14 +451,13 @@ mdb_remove_backends())
 void
 _mdb_remove_backends()
 {
-	g_hash_table_foreach_remove(mdb_backends, mdb_drop_backend, NULL);
+	g_hash_table_foreach(mdb_backends, mdb_drop_backend, NULL);
 	g_hash_table_destroy(mdb_backends);
 }
-static gboolean mdb_drop_backend(gpointer key, gpointer value, gpointer data)
+static void mdb_drop_backend(gpointer key, gpointer value, gpointer data)
 {
 	MdbBackend *backend = (MdbBackend *)value;
 	g_free (backend);
-	return TRUE;
 }
 
 /**
