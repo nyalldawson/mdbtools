@@ -203,7 +203,7 @@ mdb_crack_row(MdbTableDef *table, int row_start, int row_end, MdbField *fields)
 	}
 
 	bitmask_sz = (row_cols + 7) / 8;
-    if (bitmask_sz >= row_end) {
+    if (bitmask_sz + !IS_JET3(mdb) >= row_end) {
         fprintf(stderr, "warning: Invalid page buffer detected in mdb_crack_row.\n");
         return -1;
     }
@@ -226,6 +226,7 @@ mdb_crack_row(MdbTableDef *table, int row_start, int row_end, MdbField *fields)
 		}
         if (!success) {
             fprintf(stderr, "warning: Invalid page buffer detected in mdb_crack_row.\n");
+            g_free(var_col_offsets);
             return -1;
         }
 	}
@@ -271,6 +272,11 @@ mdb_crack_row(MdbTableDef *table, int row_start, int row_end, MdbField *fields)
 			fields[i].value = NULL;
 			fields[i].siz = 0;
 			fields[i].is_null = 1;
+		}
+		if (fields[i].start + fields[i].siz > row_end + 1) {
+			fprintf(stderr, "warning: Invalid data location detected in mdb_crack_row.\n");
+			g_free(var_col_offsets);
+			return -1;
 		}
 	}
 
@@ -585,7 +591,7 @@ mdb_insert_row(MdbTableDef *table, int num_fields, MdbField *fields)
 		mdb_buffer_dump(row_buffer, 0, new_row_size);
 	}
 	pgnum = mdb_map_find_next_freepage(table, new_row_size);
-	if (!pgnum) {
+	if (!pgnum || pgnum == -1) {
 		fprintf(stderr, "Unable to allocate new page.\n");
 		return 0;
 	}
