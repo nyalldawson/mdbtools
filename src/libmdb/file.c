@@ -251,7 +251,12 @@ static MdbHandle *mdb_handle_from_stream(FILE *stream, MdbFileFlags flags) {
  * Return value: point to MdbHandle structure.
  */
 MdbHandle *mdb_open_buffer(void *buffer, size_t len, MdbFileFlags flags) {
-    FILE *file = fmemopen(buffer, len, (flags & MDB_WRITABLE) ? "r+" : "r");
+    FILE *file = NULL;
+#ifdef HAVE_FMEMOPEN
+    file = fmemopen(buffer, len, (flags & MDB_WRITABLE) ? "r+" : "r");
+#else
+    fprintf(stderr, "mdb_open_buffer requires a platform with support for fmemopen(3)\n");
+#endif
     if (file == NULL) {
         fprintf(stderr, "Couldn't open memory buffer\n");
         return NULL;

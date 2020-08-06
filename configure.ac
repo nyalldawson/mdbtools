@@ -26,6 +26,11 @@ AC_CHECK_DECLS([program_invocation_short_name], [], [], [[
                 #define _GNU_SOURCE
                 #include <errno.h>]])
 
+dnl Checks for library functions.
+VL_LIB_READLINE
+AC_CHECK_FUNC(strptime,[ AC_DEFINE(HAVE_STRPTIME, 1, [strptime check]) AM_CONDITIONAL(HAVE_STRPTIME, true) ],[ AM_CONDITIONAL(HAVE_STRPTIME, false) ])
+AC_CHECK_FUNC(fmemopen,[ AC_DEFINE(HAVE_FMEMOPEN, 1, [fmemopen check]) ])
+
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
@@ -271,10 +276,6 @@ AM_CONDITIONAL(ENABLE_MAN, test "$enable_man" = yes)
 # Check for docbook
 ##################################################
 AM_CONDITIONAL(ENABLE_DOCBOOK, test -n "$DOCBOOK_DSL")
-
-dnl Checks for library functions.
-VL_LIB_READLINE
-AC_CHECK_FUNC(strptime,[ AC_DEFINE(HAVE_STRPTIME, 1, [strptime check]) AM_CONDITIONAL(HAVE_STRPTIME, true) ],[ AM_CONDITIONAL(HAVE_STRPTIME, false) ])
 
 localedir=${datadir}/locale
 AC_SUBST(localedir)
