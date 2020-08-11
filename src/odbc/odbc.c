@@ -1809,13 +1809,17 @@ static SQLRETURN SQL_API _SQLGetData(
 				str = NULL;
 				return SQL_SUCCESS_WITH_INFO;
 			}
-			snprintf(rgbValue, cbValueMax, "%s", str + stmt->pos);
+
+            //snprintf(rgbValue, cbValueMax, "%s", str + stmt->pos);
 			if (stmt->pos + cbValueMax < len + 1) {
-				stmt->pos += cbValueMax - 1;
+                            memcpy(rgbValue, str+ stmt->pos, cbValueMax);
+                stmt->pos += cbValueMax;// - 1;
 				if (col->col_type != MDB_OLE) { free(str); str = NULL; }
 				strcpy(sqlState, "01004"); // truncated
 				return SQL_SUCCESS_WITH_INFO;
 			}
+
+                        memcpy(rgbValue, str+ stmt->pos, len-stmt->pos);
 			stmt->pos = len;
 			free(str);
 			str = NULL;
