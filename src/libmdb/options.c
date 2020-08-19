@@ -55,7 +55,7 @@ load_options()
 	char *opt;
 	char *s;
 
-    if (!optset && (s=getenv("MDBOPTS"))) {
+	if (!optset && (s=getenv("MDBOPTS"))) {
 		opt = strtok(s, ":");
 		while (opt) {
         	if (!strcmp(opt, "use_index")) opts |= MDB_USE_INDEX;
@@ -76,9 +76,10 @@ load_options()
 			}
 			opt = strtok(NULL,":");
 		}
-    }
-    else if ( !optset )
-       opts |= MDB_USE_INDEX;
+	}
+	else if ( !optset ) {
+		opts |= MDB_USE_INDEX;
+	}
 	optset = 1;
 }
 int
