@@ -77,6 +77,8 @@ load_options()
 			opt = strtok(NULL,":");
 		}
     }
+    else if ( !optset )
+       opts |= MDB_USE_INDEX;
 	optset = 1;
 }
 int
