@@ -1,0 +1,59 @@
+SET(LIBMDB_SRCS
+  catalog.c
+  mem.c
+  file.c
+  table.c
+  data.c
+  dump.c
+  backend.c
+  money.c
+  sargs.c
+  index.c
+  like.c
+  write.c
+  stats.c
+  map.c
+  props.c
+  worktable.c
+  options.c
+  iconv.c
+ )
+
+IF(FAKE_GLIB)
+  SET(LIBMDB_SRCS
+    ${LIBMDB_SRCS}
+    fakeglib.c
+    )
+ELSE(FAKE_GLIB)
+  INCLUDE_DIRECTORIES(SYSTEM ${GLIB_INCLUDE_DIRS})
+ENDIF(FAKE_GLIB)
+ 
+SET(LIBMDB_HDRS
+  ../../include/mdbtools.h
+)
+
+INCLUDE_DIRECTORIES(
+  ../../include
+)
+
+ADD_LIBRARY(libmdb ${LIBRARY_TYPE} ${LIBMDB_SRCS} ${LIBMDB_HDRS})
+
+IF(NOT FAKE_GLIB)
+  TARGET_LINK_LIBRARIES(libmdb ${GLIB_LDFLAGS})
+ENDIF(NOT FAKE_GLIB)
+
+SET_TARGET_PROPERTIES(libmdb PROPERTIES
+  VERSION ${COMPLETE_VERSION}
+  SOVERSION ${COMPLETE_VERSION}
+)
+
+# install
+
+INSTALL(FILES ${LIBMDB_HDRS} DESTINATION ${MDBTOOLS_INCLUDE_DIR})
+
+INSTALL(TARGETS libmdb
+  RUNTIME DESTINATION ${MDBTOOLS_BIN_DIR}
+  LIBRARY DESTINATION ${MDBTOOLS_LIB_SUBDIR}
+  ARCHIVE DESTINATION ${MDBTOOLS_LIB_SUBDIR}
+  PUBLIC_HEADER DESTINATION ${MDBTOOLS_INCLUDE_DIR})
+  
